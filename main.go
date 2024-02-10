@@ -6,12 +6,12 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	_ "github.com/go-sql-driver/mysql"
+	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
 
-// User 構造体の定義
 type User struct {
+	ID         uint   `gorm:"primaryKey"`
 	Name       string `json:"name"`
 	Department string `json:"department"`
 	Email      string `json:"email"`
@@ -63,7 +63,7 @@ func main() {
 
 
 	// ユーザーを削除するエンドポイント
-	router.POST("/user/delete/:id", func(ctx *gin.Context) {
+	router.DELETE("/user/delete/:id", func(ctx *gin.Context) {
 		db := sqlConnect()
 		
 
