@@ -1,6 +1,6 @@
 import React from "react";
 import { FieldValues, SubmitHandler, useFormContext } from "react-hook-form";
-import { FormValues } from "../user/user";
+import { FormValues } from "../user/page";
 
 type formProps = {
   onSubmit: SubmitHandler<FormValues>;

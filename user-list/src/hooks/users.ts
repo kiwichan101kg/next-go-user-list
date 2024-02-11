@@ -1,7 +1,7 @@
 "use client";
 
 import { User } from "@/app/types";
-import { FormValues } from "@/app/user/user";
+import { FormValues } from "@/app/user/page";
 import { useMutation, useQuery } from "@tanstack/react-query";
 
 // ユーザー情報取得
