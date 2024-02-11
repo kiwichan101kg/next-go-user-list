@@ -4,6 +4,8 @@ import { useForm, FormProvider, SubmitHandler } from "react-hook-form";
 import { UserForm } from "../composents/userForm";
 import { UserList } from "../composents/userList";
 import { User } from "../types";
+import { useDeleteUsers, useGetUsers, usePostUsers } from "@/hooks/users";
+import { useQueryClient } from "@tanstack/react-query";
 
 export type FormValues = {
   name: string;
@@ -12,58 +14,38 @@ export type FormValues = {
   phone: string;
 };
 
-type UserProps = {
-  users: User[];
-};
-
-export const UserScreen = ({ users }: UserProps) => {
+export const UserScreen = () => {
   const methods = useForm();
+  const { data: users } = useGetUsers();
+  const { mutate: postMutate } = usePostUsers();
+  const { mutate: deleteMutate } = useDeleteUsers();
+  const queryClient = useQueryClient();
   const _onSubmit: SubmitHandler<FormValues> = async (formValue) => {
-    console.log("フォーム送信中...", formValue);
-    const res = await postUsers(formValue);
+    postMutate(formValue, {
+      onSuccess: () => {
+        queryClient.invalidateQueries({
+          queryKey: ["getUsers"],
+        });
+      },
+    });
   };
 
   const handleDelete = async (ID: number) => {
-    const res = await deleteUsers(ID);
+    deleteMutate(ID, {
+      onSuccess: () => {
+        queryClient.invalidateQueries({
+          queryKey: ["getUsers"],
+        });
+      },
+    });
   };
 
   return (
     <>
       <FormProvider {...methods}>
         <UserForm onSubmit={_onSubmit} />
-        <UserList users={users} handleDelete={handleDelete} />
+        <UserList users={users || []} handleDelete={handleDelete} />
       </FormProvider>
     </>
   );
-};
-
-const postUsers = async (
-  formValue: FormValues
-): Promise<User & { message: string }> => {
-  const res = await fetch("http://localhost:8080/user", {
-    method: "POST",
-    cache: "force-cache",
-    body: JSON.stringify(formValue),
-  });
-  if (!res.ok) {
-    // This will activate the closest `error.js` Error Boundary
-    throw new Error("Failed to fetch data");
-  }
-  const data = await res.json();
-  console.log("ユーザー情報登録", data);
-  return data.user;
-};
-
-const deleteUsers = async (ID: number): Promise<User & { message: string }> => {
-  const res = await fetch(`http://localhost:8080/user/${ID}`, {
-    method: "DELETE",
-    cache: "force-cache",
-  });
-  if (!res.ok) {
-    // This will activate the closest `error.js` Error Boundary
-    throw new Error("Failed to fetch data");
-  }
-  const data = await res.json();
-  console.log("ユーザー情報削除", data);
-  return data.user;
 };
