@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/gin-contrib/cors"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
@@ -24,6 +25,10 @@ func main() {
   
 
   router := gin.Default()
+	// CORS設定: localhost:3000からのリクエストを許容
+	config := cors.DefaultConfig()
+	config.AllowOrigins = []string{"http://localhost:3000"}
+	router.Use(cors.New(config))
 
   router.GET("/user", func(ctx *gin.Context){
 		db := sqlConnect()
@@ -63,7 +68,7 @@ func main() {
 
 
 	// ユーザーを削除するエンドポイント
-	router.DELETE("/user/delete/:id", func(ctx *gin.Context) {
+	router.DELETE("/user/:id", func(ctx *gin.Context) {
 		db := sqlConnect()
 		
 
