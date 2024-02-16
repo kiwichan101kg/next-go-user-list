@@ -5,23 +5,24 @@ import (
 	"strconv"
 	"net/http"
 
+	"next-go-app/model"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-contrib/cors"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
 
-type User struct {
-	ID         uint   `gorm:"primaryKey"`
-	Name       string `json:"name"`
-	Department string `json:"department"`
-	Email      string `json:"email"`
-	Phone      string `json:"phone"`
-}
+// type User struct {
+// 	ID         uint   `gorm:"primaryKey"`
+// 	Name       string `json:"name"`
+// 	Department string `json:"department"`
+// 	Email      string `json:"email"`
+// 	Phone      string `json:"phone"`
+// }
 
 func main() {
   db := sqlConnect()
-	db.AutoMigrate(&User{})
+	db.AutoMigrate(&model.User{})
   
 
   router := gin.Default()
@@ -32,7 +33,7 @@ func main() {
 
   router.GET("/user", func(ctx *gin.Context){
 		db := sqlConnect()
-		var users []User
+		var users []model.User
 		db.Order("created_at asc").Find(&users)
 		
 
@@ -47,7 +48,7 @@ func main() {
 		db := sqlConnect()
 		
 
-		var newUser User
+		var newUser model.User
 		// JSON形式のリクエストボディを解析してnewUserに格納
 		if err := ctx.ShouldBindJSON(&newUser); err != nil {
 			// リクエストボディの解析に失敗した場合
@@ -81,7 +82,7 @@ func main() {
 			return
 		}
 
-		var user User
+		var user model.User
 		// idに対応するユーザーを検索
 		result := db.First(&user, id)
 		if result.Error != nil {

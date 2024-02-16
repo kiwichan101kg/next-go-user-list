@@ -1,4 +1,4 @@
-module main.go
+module next-go-app
 
 go 1.21
 
